@@ -22,21 +22,14 @@ public class Server {
     }
 
     public void start() {
-        try  {
-            while(true) {
+        try {
+            while (true) {
                 System.out.println("等待客户端连接。。。");
                 Socket socket = serverSocket.accept();
-                InputStream is = socket.getInputStream();
-                InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
-                BufferedReader br = new BufferedReader(isr);
-                String line;
-                while ((line = br.readLine()) != null) {
-                    if ("exit".equals(line)) {
-                        System.out.println("客户端不说了");
-                        break;
-                    }
-                    System.out.println("客户端说：" + line);
-                }
+                System.out.println(socket.getInetAddress() + "连接了。。。");
+                ClientHandler handler = new ClientHandler(socket);
+                Thread t = new Thread(handler);
+                t.start();
             }
 
         } catch (IOException e) {
@@ -49,4 +42,32 @@ public class Server {
         Server server = new Server();
         server.start();
     }
+
+    private class ClientHandler implements Runnable {
+        private Socket socket;
+
+        public ClientHandler(Socket socket) {
+            this.socket = socket;
+        }
+
+        @Override
+        public void run() {
+            try {
+                InputStream is = socket.getInputStream();
+                InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
+                BufferedReader br = new BufferedReader(isr);
+                String line;
+                while ((line = br.readLine()) != null) {
+                    if ("exit".equals(line)) {
+                        System.out.println("客户端不说了");
+                        break;
+                    }
+                    System.out.println("Ip地址：" + socket.getInetAddress()+",说：" + line);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }
