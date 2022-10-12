@@ -32,7 +32,7 @@ public class SyncDemo1 {
 class Table {
     private int beans = 19;
 
-    public int getBeans() {
+    public synchronized int getBeans() {
         if (beans == 0) {
             throw new RuntimeException("没有豆子了");
         }
